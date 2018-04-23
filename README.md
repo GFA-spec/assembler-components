@@ -122,6 +122,7 @@ FASTA/GFA(S) + BAM/PAF &rarr; FASTA/GFA(S)
 - [ABySS](https://github.com/bcgsc/abyss#readme)
 - [BCALM2](https://github.com/GATB/bcalm#readme)
 - [lh3/gfa1](https://github.com/lh3/gfa1#readme)
+- [SGA](https://github.com/jts/sga#readme)
 - [Unicycler](https://github.com/rrwick/Unicycler#readme)
 
 A tool may combine multiple assembly stages in a single tool.
@@ -130,6 +131,7 @@ A tool may combine multiple assembly stages in a single tool.
 
 - ABySS `ABYSS` or `ABYSS-P` or `abyss-bloom-dbg` then `AdjList` or `abyss-overlap`
 - BCALM2  `bcalm | convertToGFA.py`
+- SGA `sga index | sga filter | sga overlap | sga assemble`
 
 ## Denoise
 
@@ -153,17 +155,20 @@ A tool may combine multiple assembly stages in a single tool.
 
 ## Estimate copy number
 
-None
+- SGA `sga-astat.py`
 
 ## Link unitigs
 
 - ABySS `DistanceEst` for paired-end and mate-pair reads
-- ABySS `ARCS` for linked reads
+- ABySS `abyss-longseqdist` for long reads
+- ARCS `arcs` for linked reads
 
 ## Order and orient
 
 - ABySS `abyss-scaffold` or `SimpleGraph | MergePaths`
+- SGA `sga scaffold`
 
 ## Contract paths
 
 - ABySS `MergeContigs`
+- SGA `sga scaffold2fasta`
