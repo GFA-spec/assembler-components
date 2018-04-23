@@ -9,6 +9,19 @@ Components of genome sequence assembly tools
 - [GFA2](http://gfa-spec.github.io/GFA-spec/) assembly graph
 - [SAM/BAM](http://samtools.github.io/hts-specs/) or [PAF](https://github.com/lh3/miniasm/blob/master/PAF.md) alignments of reads to draft assembly
 
+## GFA record types
+
+- GFA (S): sequence segments
+- GFA (E): overlap edges
+- GFA (G): gap edges
+- GFA (U): unordered groups of sequence segments
+- GFA (O): ordered paths of sequence segments
+
+## GFA sequence segment attributes
+
+- GFA (S[RC]): read counts
+- GFA (S[CN]): copy number estimate
+
 # Stages of genome assembly
 
 ## Unitig
