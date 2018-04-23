@@ -17,7 +17,7 @@ Components of genome sequence assembly tools
 
 **GFA**: GFA2 is preferred over GFA1. The sequence fields may be empty (`*`). The sequences may be stored in an adjacent FASTA file, named for example `assembly.gfa` and `assembly.fa`.
 
-**SAM/BAM**: SAM/BAM files are sorted by position and index, unless otherwise stated. Different sequencing libraries may be indicated with the read group `RG` attribute.
+**SAM/BAM**: SAM/BAM files are sorted by position and indexed, unless otherwise stated. Different sequencing libraries may be indicated with the read group `RG` attribute.
 
 ## GFA record types
 
