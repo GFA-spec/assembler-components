@@ -179,7 +179,8 @@ Tools are specific to each sequencing technology and numerous and so will not be
 
 ## Map reads
 
-- BWA `bwa mem`
+- ABySS `abyss-map | abyss-fixmate`
+- BWA `bwa mem -p`
 - Minimap2 `minimap2 -xsr` for short reads
 
 ## Estimate copy number
