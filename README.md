@@ -111,12 +111,20 @@ Glue vertices of paths and replace each path with a single sequence segment.
 
 GFA (SEO) &rarr; GFA (SE)
 
+## Scaffold
+
+Scaffolding is the combination of the three stages of link unitigs, order and orient, and contract paths.
+
+FASTA/GFA(S) + BAM/PAF &rarr; FASTA/GFA(S)
+
 # Tools
 
 - [ABySS](https://github.com/bcgsc/abyss#readme)
 - [BCALM2](https://github.com/GATB/bcalm#readme)
 - [lh3/gfa1](https://github.com/lh3/gfa1#readme)
 - [Unicycler](https://github.com/rrwick/Unicycler#readme)
+
+A tool may combine multiple assembly stages in a single tool.
 
 ## Unitig
 
