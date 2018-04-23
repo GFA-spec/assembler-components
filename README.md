@@ -32,6 +32,14 @@ Components of genome sequence assembly tools
 - GFA (S[RC]): read counts
 - GFA (S[CN]): copy number estimate
 
+# Notation
+
+type1(record[attributes],&hellip;) + &hellip; &rarr; type2(record[attributes],&hellip;) + &hellip;
+
+This stage requires a file of type1 and produces a file of type2. For example, estimate copy number of unitigs. A GFA file of sequence segments and edges and a BAM or PAF file of mapped reads produces a GFA file with estimated copy numbers of unitigs.
+
+GFA (SE) + BAM/PAF &rarr; GFA (S[CN],E)
+
 # Stages of genome assembly
 
 ## Unitig
@@ -80,10 +88,10 @@ FASTQ + FASTA &rarr; FASTQ + FASTA + BAM
 
 Estimate the copy number of each unitig.
 
-FASTA/GFA(S) + BAM/PAF &rarr; GFA (S[CN])
+GFA (SE) + BAM/PAF &rarr; GFA (S[CN],E)
 
-- Count reads per unitig: GFA (S) + BAM/PAF &rarr; GFA (S[RC])
-- Estimate copy number: GFA (S[RC]) &rarr; GFA (S[CN])
+- Count reads per unitig: GFA (SE) + BAM/PAF &rarr; GFA (S[RC],E)
+- Estimate copy number: GFA (S[RC],E) &rarr; GFA (S[CN],E)
 
 ## Link unitigs
 
