@@ -78,9 +78,9 @@ GFA (SE) &rarr; GFA (SE)
 - Prune tips
 - Collapse bulges due to sequencing errors
 
-## Identify/collapse heterozygous sequences
+## Collapse bulges
 
-Identify bulges caused by heterozygosity.
+Collapse bulges caused by heterozygosity.
 
 GFA (SE) &rarr; GFA (SE)
 
@@ -167,9 +167,9 @@ Tools are specific to each sequencing technology and numerous and so will not be
 - ABySS `abyss-filtergraph`
 - lh3/gfa1 `gfaview -t`
 
-## Identify/collapse heterozygous sequences
+## Collapse bulges
 
-- ABySS `PopBubbles`
+- ABySS `PopBubbles | MergeContigs`
 - lh3/gfa1 `gfaview -b`
 
 ## Thread reads
