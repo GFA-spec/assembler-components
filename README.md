@@ -110,3 +110,52 @@ GFA (SEG) &rarr; GFA (SEO)
 Glue vertices of paths and replace each path with a single sequence segment.
 
 GFA (SEO) &rarr; GFA (SE)
+
+# Tools
+
+- [ABySS](https://github.com/bcgsc/abyss#readme)
+- [BCALM2](https://github.com/GATB/bcalm#readme)
+- [lh3/gfa1](https://github.com/lh3/gfa1#readme)
+- [Unicycler](https://github.com/rrwick/Unicycler#readme)
+
+## Unitig
+
+- ABySS `ABYSS` or `ABYSS-P` or `abyss-bloom-dbg` then `AdjList` or `abyss-overlap`
+- BCALM2  `bcalm | convertToGFA.py`
+
+## Denoise
+
+- ABySS `abyss-filtergraph`
+- lh3/gfa1 `gfaview -t`
+
+## Identify/collapse heterozygous sequences
+
+- ABySS `PopBubbles`
+- lh3/gfa1 `gfaview -b`
+
+## Thread reads
+
+- Minimap2 `minimap2`
+- Unicycler `unicycler_align`
+
+## Map reads
+
+- BWA `bwa mem`
+- Minimap2 `minimap2 -xsr` for short reads
+
+## Estimate copy number
+
+None
+
+## Link unitigs
+
+- ABySS `DistanceEst` for paired-end and mate-pair reads
+- ABySS `ARCS` for linked reads
+
+## Order and orient
+
+- ABySS `abyss-scaffold` or `SimpleGraph | MergePaths`
+
+## Contract paths
+
+- ABySS `MergeContigs`
