@@ -6,8 +6,18 @@ Components of genome sequence assembly tools
 
 - FASTQ reads
 - FASTA contigs
-- [GFA2](http://gfa-spec.github.io/GFA-spec/) assembly graph
+- [GFA](http://gfa-spec.github.io/GFA-spec/) assembly graph
 - [SAM/BAM](http://samtools.github.io/hts-specs/) or [PAF](https://github.com/lh3/miniasm/blob/master/PAF.md) alignments of reads to draft assembly
+
+**FASTA/FASTQ**: Optional attributes are found in the comment field, and formatted as in SAM, `XX:x:xxxx`. The comment field follows a space in the header.
+
+**FASTQ**: Paired-end reads are interleaved and may be compressed. Linked read barcodes may be indicated with the `BX` tag.
+
+**FASTA**: The sequence should not be line wrapped. The FASTA file should be indexed (FAI).
+
+**GFA**: GFA2 is preferred over GFA1. The sequence fields may be empty (`*`). The sequences may be stored in an adjacent FASTA file, named for example `assembly.gfa` and `assembly.fa`.
+
+**SAM/BAM**: SAM/BAM files are sorted by position and index, unless otherwise stated. Different sequencing libraries may be indicated with the read group `RG` attribute.
 
 ## GFA record types
 
