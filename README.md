@@ -42,6 +42,23 @@ GFA (SE) + BAM/PAF &rarr; GFA (S[CN],E)
 
 # Stages of genome assembly
 
+## Preprocess reads
+
+Remove sequencing artifacts specific to each sequencing technology.
+
+FASTQ &rarr; FASTQ
+
+- Trim adapter sequences
+- Split chimeric reads
+- Merge overlapping paired-end reads
+- Extract barcode sequences
+
+## Correct reads
+
+Correct sequencing errors in reads.
+
+FASTQ &rarr; FASTQ
+
 ## Unitig
 
 Assemble unitigs by de Bruijn graph assembly.
@@ -121,11 +138,23 @@ FASTA/GFA(S) + BAM/PAF &rarr; FASTA/GFA(S)
 
 - [ABySS](https://github.com/bcgsc/abyss#readme)
 - [BCALM2](https://github.com/GATB/bcalm#readme)
+- [BCOOL](https://github.com/Malfoy/BCOOL#readme)
+- [BFC](https://github.com/lh3/bfc#readme)
 - [lh3/gfa1](https://github.com/lh3/gfa1#readme)
 - [SGA](https://github.com/jts/sga#readme)
 - [Unicycler](https://github.com/rrwick/Unicycler#readme)
 
 A tool may combine multiple assembly stages in a single tool.
+
+## Preprocess reads
+
+Tools are specific to each sequencing technology and numerous and so will not be listed here.
+
+## Correct reads
+
+- BFC `bfc`
+- BCOOL `Bcool.py`
+- SGA `sga index | sga correct`
 
 ## Unitig
 
