@@ -179,7 +179,7 @@ Tools are specific to each sequencing technology and numerous and so will not be
 
 ## Map reads
 
-- ABySS `abyss-map | abyss-fixmate`
+- ABySS `abyss-map`
 - BWA `bwa mem -p`
 - Minimap2 `minimap2 -xsr` for short reads
 
@@ -189,7 +189,7 @@ Tools are specific to each sequencing technology and numerous and so will not be
 
 ## Link unitigs
 
-- ABySS `DistanceEst` for paired-end and mate-pair reads
+- ABySS `abyss-fixmate | DistanceEst` for paired-end and mate-pair reads
 - ABySS `abyss-longseqdist` for long reads
 - ARCS `arcs` for linked reads
 
@@ -213,7 +213,7 @@ This data is from Unicycler: "These are synthetic reads from plasmids A, B and E
 
 ```sh
 # Install the dependencies
-brew install abyss curl samtools seqtk
+brew install abyss curl pigz samtools seqtk
 # Download the data
 seqtk mergepe <(curl -Ls https://github.com/rrwick/Unicycler/raw/master/sample_data/short_reads_1.fastq.gz) <(curl -Ls https://github.com/rrwick/Unicycler/raw/master/sample_data/short_reads_2.fastq.gz) | gzip >pe.fq.gz
 # Unitig
@@ -225,11 +225,11 @@ abyss-filtergraph --gfa2 -k100 -t200 -c3 -g 2_denoise.gfa 1_unitig.gfa
 PopBubbles --gfa2 -k100 -p0.99 -g 3_debulge.gfa 1_unitig.fa 2_denoise.gfa >3_debulge.path
 MergeContigs --gfa2 -k100 -g 3_debulge.gfa -o 3_debulge.fa 1_unitig.fa 2_denoise.gfa 3_debulge.path
 # Map reads
-gunzip -c pe.fq.gz | abyss-map - 3_debulge.fa | abyss-fixmate -h pe.tsv | samtools sort -o 3_debulge.bam
+gunzip -c pe.fq.gz | abyss-map - 3_debulge.fa | pigz >3_debulge.sam.gz
 # Link unitigs
-samtools view -h 3_debulge.bam | DistanceEst --dot -k100 -s500 -n1 pe.tsv >4_link.gv
+gunzip -c 3_debulge.sam.gz | abyss-fixmate -h 4_link.tsv | samtools sort -Osam | DistanceEst --dot -k100 -s500 -n1 4_link.tsv >4_link.gv
 # Order and orient
-abyss-scaffold -k100 -s200-1000 -n5 3_debulge.gfa 4_link.gv >5_order.path
+abyss-scaffold -k100 -s500-1000 -n5-10 3_debulge.gfa 4_link.gv >5_order.path
 # Contract paths
 MergeContigs --gfa2 -k100 -g assembly.gfa -o assembly.fa 3_debulge.fa 3_debulge.gfa 5_order.path
 # Compute assembly metrics
