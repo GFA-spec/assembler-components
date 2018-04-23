@@ -202,3 +202,40 @@ Tools are specific to each sequencing technology and numerous and so will not be
 
 - ABySS `MergeContigs`
 - SGA `sga scaffold2fasta`
+
+# Pipelines
+
+## ABySS
+
+Assemble paired-end reads using ABySS. This ABySS pipeline is a minimal subset of tools run by the complete `abyss-pe` pipeline.
+
+This data is from Unicycler: "These are synthetic reads from plasmids A, B and E from the Shigella sonnei 53G genome assembly". [Shigella sonnei plasmids (synthetic reads)](https://github.com/rrwick/Unicycler/tree/master/sample_data#shigella-sonnei-plasmids-synthetic-reads), [short_reads_1.fastq.gz](https://github.com/rrwick/Unicycler/raw/master/sample_data/short_reads_1.fastq.gz), [short_reads_2.fastq.gz](https://github.com/rrwick/Unicycler/raw/master/sample_data/short_reads_2.fastq.gz)
+
+```sh
+# Install the dependencies
+brew install abyss curl samtools seqtk
+# Download the data
+seqtk mergepe <(curl -Ls https://github.com/rrwick/Unicycler/raw/master/sample_data/short_reads_1.fastq.gz) <(curl -Ls https://github.com/rrwick/Unicycler/raw/master/sample_data/short_reads_2.fastq.gz) | gzip >pe.fq.gz
+# Unitig
+gunzip -c pe.fq.gz | ABYSS -k100 -t0 -c0 -b0 -o 1_unitig.fa -
+AdjList --gfa2 -k100 1_unitig.fa >1_unitig.gfa 
+# Denoise
+abyss-filtergraph --gfa2 -k100 -t200 -c3 -g 2_denoise.gfa 1_unitig.gfa
+# Collapse bulges
+PopBubbles --gfa2 -k100 -p0.99 -g 3_debulge.gfa 1_unitig.fa 2_denoise.gfa >3_debulge.path
+MergeContigs --gfa2 -k100 -g 3_debulge.gfa -o 3_debulge.fa 1_unitig.fa 2_denoise.gfa 3_debulge.path
+# Map reads
+gunzip -c pe.fq.gz | abyss-map - 3_debulge.fa | abyss-fixmate -h pe.tsv | samtools sort -o 3_debulge.bam
+# Link unitigs
+samtools view -h 3_debulge.bam | DistanceEst --dot -k100 -s500 -n1 pe.tsv >4_link.gv
+# Order and orient
+abyss-scaffold -k100 -s200-1000 -n5 3_debulge.gfa 4_link.gv >5_order.path
+# Contract paths
+MergeContigs --gfa2 -k100 -g assembly.gfa -o assembly.fa 3_debulge.fa 3_debulge.gfa 5_order.path
+# Compute assembly metrics
+abyss-fac assembly.fa
+# Convert GFA2 to GFA1
+abyss-todot --gfa1 assembly.gfa >assembly.gfa1
+# Visualize assembly graph using Bandage
+Bandage load assembly.gfa1 &
+```
