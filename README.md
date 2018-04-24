@@ -32,6 +32,22 @@ Components of genome sequence assembly tools
 - GFA (S[RC]): read counts
 - GFA (S[CN]): copy number estimate
 
+## File names
+
+An assembly is contained in a single directory. The files are named according to the pattern `[0-9]+_[a-z]+\.[a-z.]+`. The numeric prefixes are zero-padded and identical in length, and they indicate the stage of the assembly. A descriptive name and file type extension follow. The files may be compressed.
+
+### Example
+
+```
+0_pe.fq.gz
+1_unitig.gfa
+2_denoise.gfa
+3_debulge.gfa 3_debulge.bam 3_debulge.bam.bai
+4_link.gfa
+5_scaffold.gfa
+6_assembly.gfa 6_assembly.fa 6_assembly.fa.fai 6_assembly.bam 6_assembly.bam.bai
+```
+
 # Notation
 
 type1(record[attributes],&hellip;) + &hellip; &rarr; type2(record[attributes],&hellip;) + &hellip;
