@@ -215,9 +215,9 @@ This data is from Unicycler: "These are synthetic reads from plasmids A, B and E
 # Install the dependencies
 brew install abyss curl pigz samtools seqtk
 # Download the data
-seqtk mergepe <(curl -Ls https://github.com/rrwick/Unicycler/raw/master/sample_data/short_reads_1.fastq.gz) <(curl -Ls https://github.com/rrwick/Unicycler/raw/master/sample_data/short_reads_2.fastq.gz) | gzip >pe.fq.gz
+seqtk mergepe <(curl -Ls https://github.com/rrwick/Unicycler/raw/master/sample_data/short_reads_1.fastq.gz) <(curl -Ls https://github.com/rrwick/Unicycler/raw/master/sample_data/short_reads_2.fastq.gz) | gzip >0_pe.fq.gz
 # Unitig
-gunzip -c pe.fq.gz | ABYSS -k100 -t0 -c0 -b0 -o 1_unitig.fa -
+gunzip -c 0_pe.fq.gz | ABYSS -k100 -t0 -c0 -b0 -o 1_unitig.fa -
 AdjList --gfa2 -k100 1_unitig.fa >1_unitig.gfa 
 # Denoise
 abyss-filtergraph --gfa2 -k100 -t200 -c3 -g 2_denoise.gfa 1_unitig.gfa
@@ -225,17 +225,17 @@ abyss-filtergraph --gfa2 -k100 -t200 -c3 -g 2_denoise.gfa 1_unitig.gfa
 PopBubbles --gfa2 -k100 -p0.99 -g 3_debulge.gfa 1_unitig.fa 2_denoise.gfa >3_debulge.path
 MergeContigs --gfa2 -k100 -g 3_debulge.gfa -o 3_debulge.fa 1_unitig.fa 2_denoise.gfa 3_debulge.path
 # Map reads
-gunzip -c pe.fq.gz | abyss-map - 3_debulge.fa | pigz >3_debulge.sam.gz
+gunzip -c 0_pe.fq.gz | abyss-map - 3_debulge.fa | pigz >3_debulge.sam.gz
 # Link unitigs
 gunzip -c 3_debulge.sam.gz | abyss-fixmate -h 4_link.tsv | samtools sort -Osam | DistanceEst --dot -k100 -s500 -n1 4_link.tsv >4_link.gv
 # Order and orient
 abyss-scaffold -k100 -s500-1000 -n5-10 3_debulge.gfa 4_link.gv >5_order.path
 # Contract paths
-MergeContigs --gfa2 -k100 -g assembly.gfa -o assembly.fa 3_debulge.fa 3_debulge.gfa 5_order.path
+MergeContigs --gfa2 -k100 -g 6_assembly.gfa -o 6_assembly.fa 3_debulge.fa 3_debulge.gfa 5_order.path
 # Compute assembly metrics
-abyss-fac assembly.fa
+abyss-fac 6_assembly.fa
 # Convert GFA2 to GFA1
-abyss-todot --gfa1 assembly.gfa >assembly.gfa1
+abyss-todot --gfa1 6_assembly.gfa >6_assembly.gfa1
 # Visualize assembly graph using Bandage
-Bandage load assembly.gfa1 &
+Bandage load 6_assembly.gfa1 &
 ```
