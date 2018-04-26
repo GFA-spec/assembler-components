@@ -8,6 +8,7 @@ Components of genome sequence assembly tools
 - FASTA contigs
 - [GFA](http://gfa-spec.github.io/GFA-spec/) assembly graph
 - [SAM/BAM](http://samtools.github.io/hts-specs/) or [PAF](https://github.com/lh3/miniasm/blob/master/PAF.md) alignments of reads to draft assembly
+- TSV (tab-separated values) tabular data
 
 **FASTA/FASTQ**: Optional attributes are found in the comment field, and formatted as in SAM, `XX:x:xxxx`. The comment field follows a space in the header.
 
@@ -69,6 +70,17 @@ FASTQ &rarr; FASTQ
 - Split chimeric reads
 - Merge overlapping paired-end reads
 - Extract barcode sequences
+
+## Quality control
+
+Assess the quality of the sequencing, and estimate parameters of the genome.
+
+FASTQ &rarr; TSV
+
+- Assess the quality of the reads
+- Estimate sequencing depth
+- Estimate parameters of the genome, size as size, heterozygosity, and repetitiveness
+- Predict assembly parameters, such as *k*-mer size and minimum *k*-mer abundance
 
 ## Correct reads
 
@@ -193,12 +205,17 @@ FASTA/GFA (S) &rarr; TSV
 - [BCOOL](https://github.com/Malfoy/BCOOL#readme)
 - [BFC](https://github.com/lh3/bfc#readme)
 - [EMA](http://ema.csail.mit.edu)
+- [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
+- [GenomeScope](https://github.com/schatzlab/genomescope#readme)
+- [KmerGenie](http://kmergenie.bx.psu.edu/)
 - [lh3/gfa1](https://github.com/lh3/gfa1#readme)
 - [Long Ranger](https://10xgenomics.com)
 - [Nanopolish](https://github.com/jts/nanopolish#readme)
+- [ntCard](https://github.com/bcgsc/ntcard#readme)
 - [Pilon](https://github.com/broadinstitute/pilon#readme)
 - [QUAST](https://github.com/ablab/quast#readme)
 - [Racon](https://github.com/isovic/racon#readme)
+- [SGA](https://github.com/jts/sga#readme)
 - [SGA](https://github.com/jts/sga#readme)
 - [Tigmint](https://github.com/bcgsc/tigmint#readme)
 - [Unicycler](https://github.com/rrwick/Unicycler#readme)
@@ -208,6 +225,14 @@ A tool may combine multiple assembly stages in a single tool.
 ## Preprocess reads
 
 Tools are specific to each sequencing technology and numerous and so will not be listed here.
+
+## Quality control
+
+- FastQC
+- GenomeScope
+- KmerGenie
+- ntCard
+- SGA `sga preqc`
 
 ## Correct reads
 
