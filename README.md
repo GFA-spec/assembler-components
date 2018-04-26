@@ -171,9 +171,24 @@ Map the reads to the assembly and correct assembly errors.
 
 FASTQ + FASTA/GFA (SE) + BAM/PAF &rarr; FASTA/GFA (SE)
 
+## Visualize the assembly graph
+
+GFA (SE) &rarr; PNG/SVG
+
+## Assess assembly quality
+
+Assess the contiguity and correctness of the assembly.
+
+FASTA/GFA (S) &rarr; TSV
+
+- Compute assembly metrics, such as N50 and NG50
+- Align the assembly to the reference genome
+- Compute assembly metrics, such as NGA50 and number of misassemblies
+
 # Tools
 
 - [ABySS](https://github.com/bcgsc/abyss#readme)
+- [Bandage](https://github.com/rrwick/Bandage#readme)
 - [BCALM2](https://github.com/GATB/bcalm#readme)
 - [BCOOL](https://github.com/Malfoy/BCOOL#readme)
 - [BFC](https://github.com/lh3/bfc#readme)
@@ -182,6 +197,7 @@ FASTQ + FASTA/GFA (SE) + BAM/PAF &rarr; FASTA/GFA (SE)
 - [Long Ranger](https://10xgenomics.com)
 - [Nanopolish](https://github.com/jts/nanopolish#readme)
 - [Pilon](https://github.com/broadinstitute/pilon#readme)
+- [QUAST](https://github.com/ablab/quast#readme)
 - [Racon](https://github.com/isovic/racon#readme)
 - [SGA](https://github.com/jts/sga#readme)
 - [Tigmint](https://github.com/bcgsc/tigmint#readme)
@@ -255,6 +271,15 @@ Tools are specific to each sequencing technology and numerous and so will not be
 - Racon for long reads
 - Tigmint to correct large-scale misassemblies with linked reads
 
+# Visualize the assembly graph
+
+- Bandage
+
+## Assess assembly quality
+
+- ABySS `abyss-fac` and `abyss-samtobreak`
+- QUAST
+
 # Pipelines
 
 ## ABySS
@@ -288,6 +313,6 @@ MergeContigs --gfa2 -k100 -g 6_assembly.gfa -o 6_assembly.fa 3_debulge.fa 3_debu
 abyss-fac 6_assembly.fa
 # Convert GFA2 to GFA1
 abyss-todot --gfa1 6_assembly.gfa >6_assembly.gfa1
-# Visualize assembly graph using Bandage
+# Visualize the assembly graph
 Bandage load 6_assembly.gfa1 &
 ```
