@@ -357,15 +357,25 @@ MergeContigs --gfa2 -k100 -g 3_debulge.gfa -o 3_debulge.fa 1_unitig.fa 2_denoise
 # Map reads
 gunzip -c 0_pe.fq.gz | abyss-map - 3_debulge.fa | pigz >3_debulge.sam.gz
 # Link unitigs
-gunzip -c 3_debulge.sam.gz | abyss-fixmate -h 4_link.tsv | samtools sort -Osam | DistanceEst --dot -k100 -s500 -n1 4_link.tsv >4_link.gv
-# Order and orient
-abyss-scaffold -k100 -s500-1000 -n5-10 3_debulge.gfa 4_link.gv >5_order.path
+gunzip -c 3_debulge.sam.gz | abyss-fixmate -h 4_link.tsv | samtools sort -Osam | DistanceEst --dist -k100 -s500 -n1 4_link.tsv >4_link.dist
+# Resolve repeats
+samtools faidx 3_debulge.fa
+SimpleGraph -k100 -s500 -n5 -o 5_resolverepeats-1.path 3_debulge.gfa 4_link.dist
+MergePaths -k100 -o 5_resolverepeats.path 3_debulge.fa.fai 5_resolverepeats-1.path
 # Contract paths
-MergeContigs --gfa2 -k100 -g 6_assembly.gfa -o 6_assembly.fa 3_debulge.fa 3_debulge.gfa 5_order.path
+MergeContigs --gfa2 -k100 -g 6_contigs.gfa -o 6_contigs.fa 3_debulge.fa 3_debulge.gfa 5_resolverepeats.path
+# Map reads
+gunzip -c 0_pe.fq.gz | abyss-map - 6_contigs.fa | pigz >6_contigs.sam.gz
+# Link unitigs
+gunzip -c 6_contigs.sam.gz | abyss-fixmate -h 7_link.tsv | samtools sort -Osam | DistanceEst --dot -k100 -s500 -n1 7_link.tsv >7_link.gv
+# Order and orient
+abyss-scaffold -k100 -s500-1000 -n5-10 6_contigs.gfa 7_link.gv >8_scaffold.path
+# Contract paths
+MergeContigs --gfa2 -k100 -g 9_assembly.gfa -o 9_assembly.fa 6_contigs.fa 6_contigs.gfa 8_scaffold.path
 # Compute assembly metrics
-abyss-fac 6_assembly.fa
+abyss-fac 9_assembly.fa
 # Convert GFA2 to GFA1
-abyss-todot --gfa1 6_assembly.gfa >6_assembly.gfa1
+abyss-todot --gfa1 9_assembly.gfa >9_assembly.gfa1
 # Visualize the assembly graph
-Bandage load 6_assembly.gfa1 &
+Bandage load 9_assembly.gfa1 &
 ```
