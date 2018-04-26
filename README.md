@@ -30,6 +30,7 @@ Components of genome sequence assembly tools
 ## GFA sequence segment attributes
 
 - GFA (S[RC]): read counts
+- GFA (S[DP]): depth of coverage
 - GFA (S[CN]): copy number estimate
 
 ## File names
@@ -123,12 +124,17 @@ FASTQ + FASTA &rarr; FASTQ + FASTA + BAM
 
 ## Estimate copy number
 
-Estimate the copy number of each unitig.
+Estimate the copy number of each sequence segment.
 
 GFA (SE) + BAM/PAF &rarr; GFA (S[CN],E)
 
-- Count reads per unitig: GFA (SE) + BAM/PAF &rarr; GFA (S[RC],E)
-- Estimate copy number: GFA (S[RC],E) &rarr; GFA (S[CN],E)
+- | **Calculate depth of each sequence segment**
+  | Count mapped reads and calculate depth of coverage of each sequence segment.
+  | GFA (SE) + BAM/PAF &rarr; GFA (S[RC,DP],E)
+- | **Estimate the copy number of each sequence segment**
+  | GFA (S[RC,DP],E) &rarr; GFA (S[RC,DP,CN],E)
+
+Note that the median depth of coverage is more robust than the mean depth of coverage to the alignment artifacts caused by collapsed repeats, misaligned reads, and other issues.
 
 ## Scaffold
 
