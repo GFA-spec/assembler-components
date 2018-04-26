@@ -78,13 +78,22 @@ FASTQ &rarr; FASTQ
 
 ## Unitig
 
-Assemble unitigs by de Bruijn graph assembly.
+Assemble unitigs by de Bruijn graph (dBG) assembly or overlap, layout, consensus (OLC) assembly.
 
 FASTQ &rarr; GFA (SE)
+
+### de Bruijn Graph (dBG)
 
 - Count *k*-mers
 - Filter *k*-mers by abundance
 - Compact the graph
+- Compute the sequences of the unitigs
+
+### Overlap, layout, consensus (OLC)
+
+- Find all pairwise overlaps of reads
+- Determine the order and orientation of reads
+- Compute the consensus sequences of the unitigs
 
 ## Denoise
 
