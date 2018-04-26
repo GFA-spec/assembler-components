@@ -177,6 +177,12 @@ Contigs are created by contiguous paths of sequence segments. Scaffolds are crea
   | Glue vertices of paths and replace each path with a single sequence segment.
   | GFA (SEO) &rarr; GFA (SE)
 
+## Fill gaps
+
+Assemble the sequence found in the scaffold gaps between adjacent contigs.
+
+FASTQ + FASTA/GFA (S) &rarr; FASTA/GFA (S)
+
 ## Polish
 
 Map the reads to the assembly and correct assembly errors.
@@ -306,6 +312,10 @@ A tool may combine multiple assembly stages in a single tool.
 
 - ABySS `MergeContigs`
 - SGA `sga scaffold2fasta`
+
+## Fill gaps
+
+- ABySS `abyss-sealer`
 
 ## Polish
 
