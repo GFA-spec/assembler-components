@@ -123,13 +123,13 @@ A single sequence or path through the bulge may be selected, or the bulge may be
 
 Align reads to the assembly graph.
 
-FASTQ + GFA (SE) + FASTQ &rarr; FASTQ + GFA (SE) + PAF
+FASTQ + GFA (SE) + FASTQ &rarr; PAF
 
 ## Map reads
 
 Map reads to their single best position in the draft genome.
 
-FASTQ + FASTA &rarr; FASTQ + FASTA + BAM
+FASTQ + GFA (S)/FASTA &rarr; BAM
 
 ## Estimate copy number
 
