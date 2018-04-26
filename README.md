@@ -126,29 +126,25 @@ GFA (SE) + BAM/PAF &rarr; GFA (S[CN],E)
 - Count reads per unitig: GFA (SE) + BAM/PAF &rarr; GFA (S[RC],E)
 - Estimate copy number: GFA (S[RC],E) &rarr; GFA (S[CN],E)
 
-## Link unitigs
-
-Identify pairs of unitigs that are proximal. Estimate their relative order, orientation, and distance.
-
-GFA (SE) + BAM/PAF &rarr; GFA (SEG)
-
-## Order and orient
-
-Order and orient paths of unitigs. Contigs are created by contiguous paths of sequence segments. Scaffolds are created by discontiguous paths of sequence segments.
-
-GFA (SEG) &rarr; GFA (SEO)
-
-## Contract paths
-
-Glue vertices of paths and replace each path with a single sequence segment.
-
-GFA (SEO) &rarr; GFA (SE)
-
 ## Scaffold
 
-Scaffolding is the combination of the three stages of link unitigs, order and orient, and contract paths.
+Order and orient sequence segments using alignments of reads to the assembly, and produce new sequences and segments.
 
-FASTA/GFA(S) + BAM/PAF &rarr; FASTA/GFA(S)
+FASTA/GFA (SE) + BAM/PAF &rarr; FASTA/GFA (SE)
+
+A tool may implement scaffolding as a single stage of assembly. Scaffolding however may be viewed as composed of the three distinct stages: link unitigs, order and orient unitigs to construct paths, and contract paths to create new sequence segments.
+
+Contigs are created by contiguous paths of sequence segments. Scaffolds are created by discontiguous paths of sequence segments.
+
+- | **Link unitigs**
+  | Identify pairs of unitigs that are proximal. Estimate their relative order, orientation, and distance.
+  | GFA (SE) + BAM/PAF &rarr; GFA (SEG)
+- | **Order and orient**
+  | Order and orient paths of unitigs.
+  | GFA (SEG) &rarr; GFA (SEO)
+- | **Contract paths**
+  | Glue vertices of paths and replace each path with a single sequence segment.
+  | GFA (SEO) &rarr; GFA (SE)
 
 # Tools
 
