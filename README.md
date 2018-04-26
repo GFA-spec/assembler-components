@@ -165,6 +165,12 @@ Contigs are created by contiguous paths of sequence segments. Scaffolds are crea
   | Glue vertices of paths and replace each path with a single sequence segment.
   | GFA (SEO) &rarr; GFA (SE)
 
+## Polish
+
+Map the reads to the assembly and correct assembly errors.
+
+FASTQ + FASTA/GFA (SE) + BAM/PAF &rarr; FASTA/GFA (SE)
+
 # Tools
 
 - [ABySS](https://github.com/bcgsc/abyss#readme)
@@ -172,7 +178,11 @@ Contigs are created by contiguous paths of sequence segments. Scaffolds are crea
 - [BCOOL](https://github.com/Malfoy/BCOOL#readme)
 - [BFC](https://github.com/lh3/bfc#readme)
 - [lh3/gfa1](https://github.com/lh3/gfa1#readme)
+- [Nanopolish](https://github.com/jts/nanopolish#readme)
+- [Pilon](https://github.com/broadinstitute/pilon#readme)
+- [Racon](https://github.com/isovic/racon#readme)
 - [SGA](https://github.com/jts/sga#readme)
+- [Tigmint](https://github.com/bcgsc/tigmint#readme)
 - [Unicycler](https://github.com/rrwick/Unicycler#readme)
 
 A tool may combine multiple assembly stages in a single tool.
@@ -233,6 +243,13 @@ Tools are specific to each sequencing technology and numerous and so will not be
 
 - ABySS `MergeContigs`
 - SGA `sga scaffold2fasta`
+
+## Polish
+
+- Nanopolish for Nanopore reads
+- Pilon for short reads
+- Racon for long reads
+- Tigmint to correct large-scale misassemblies with linked reads
 
 # Pipelines
 
