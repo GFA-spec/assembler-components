@@ -1,6 +1,12 @@
 # Assembler Components
 
-Components of genome sequence assembly tools
+Components of genome sequence assembly tools. 
+
+# Rationale
+
+Genome, metagenome and transcriptome assemblers range from fully integrated to fully modular. Fully modular assembly has a number of benefits. This repository is ongoing work to define some important checkpoints in a modular assembly pipeline, along with standard input/output formats. For now we have a bias towards Illumina-type sequencing data (single reads, paired reads, mate-pairs, 10x), but we aim to make the components also compatible with 3rd generation reads. 
+
+Feel free to contribute via pull-requests.
 
 # File formats
 
@@ -56,100 +62,6 @@ This stage requires a file of type1 and produces a file of type2. For example, e
 
 GFA (SE) + BAM/PAF &rarr; GFA (S[CN],E)
 
-# Stages of genome assembly
-
-## Preprocess reads
-
-Remove sequencing artifacts specific to each sequencing technology.
-
-FASTQ &rarr; FASTQ
-
-- Trim adapter sequences
-- Split chimeric reads
-- Merge overlapping paired-end reads
-- Extract barcode sequences
-
-## Correct reads
-
-Correct sequencing errors in reads.
-
-FASTQ &rarr; FASTQ
-
-## Unitig
-
-Assemble unitigs by de Bruijn graph assembly.
-
-FASTQ &rarr; GFA (SE)
-
-- Count *k*-mers
-- Filter *k*-mers by abundance
-- Compact the graph
-
-## Denoise
-
-Remove sequences and edges caused by sequencing error.
-
-GFA (SE) &rarr; GFA (SE)
-
-- Prune tips
-- Collapse bulges due to sequencing errors
-
-## Collapse bulges
-
-Collapse bulges caused by heterozygosity.
-
-GFA (SE) &rarr; GFA (SE)
-
-- Identify bulges: GFA (SE) &rarr; GFA (SEU)
-- Collapse bulges: GFA (SEU) &rarr; GFA (SE)
-
-Collapsed bulges may select a single sequence or may compute a consensus sequence, using IUPAC ambiguity codes.
-
-## Thread reads
-
-Align reads to the assembly graph.
-
-FASTQ + GFA (SE) + FASTQ &rarr; FASTQ + GFA (SE) + PAF
-
-## Map reads
-
-Map reads to their single best position in the draft genome.
-
-FASTQ + FASTA &rarr; FASTQ + FASTA + BAM
-
-## Estimate copy number
-
-Estimate the copy number of each unitig.
-
-GFA (SE) + BAM/PAF &rarr; GFA (S[CN],E)
-
-- Count reads per unitig: GFA (SE) + BAM/PAF &rarr; GFA (S[RC],E)
-- Estimate copy number: GFA (S[RC],E) &rarr; GFA (S[CN],E)
-
-## Link unitigs
-
-Identify pairs of unitigs that are proximal. Estimate their relative order, orientation, and distance.
-
-GFA (SE) + BAM/PAF &rarr; GFA (SEG)
-
-## Order and orient
-
-Order and orient paths of unitigs. Contigs are created by contiguous paths of sequence segments. Scaffolds are created by discontiguous paths of sequence segments.
-
-GFA (SEG) &rarr; GFA (SEO)
-
-## Contract paths
-
-Glue vertices of paths and replace each path with a single sequence segment.
-
-GFA (SEO) &rarr; GFA (SE)
-
-## Scaffold
-
-Scaffolding is the combination of the three stages of link unitigs, order and orient, and contract paths.
-
-FASTA/GFA(S) + BAM/PAF &rarr; FASTA/GFA(S)
-
 # Tools
 
 - [ABySS](https://github.com/bcgsc/abyss#readme)
@@ -162,59 +74,150 @@ FASTA/GFA(S) + BAM/PAF &rarr; FASTA/GFA(S)
 
 A tool may combine multiple assembly stages in a single tool.
 
+# Stages of genome assembly
+
 ## Preprocess reads
+
+Remove sequencing artifacts specific to each sequencing technology. And overall, improve the quality of input reads with minimal loss of information (e.g. variants).
+
+FASTQ &rarr; FASTQ
+
+- Trim adapter sequences
+- Split chimeric reads
+- Merge overlapping paired-end reads
+- Extract barcode sequences
 
 Tools are specific to each sequencing technology and numerous and so will not be listed here.
 
-## Correct reads
-
-- BFC `bfc`
-- BCOOL `Bcool.py`
-- SGA `sga index | sga correct`
+- Correct sequencing errors in reads
+     - BFC `bfc`
+     - BCOOL `Bcool.py`
+     - SGA `sga index | sga correct`
 
 ## Unitig
+
+Assemble unitigs by de Bruijn graph assembly.
+
+FASTQ &rarr; GFA (SE)
+
+- Count *k*-mers
+- Filter *k*-mers by abundance
+- Compact the graph
+
+Tools:
 
 - ABySS `ABYSS` or `ABYSS-P` or `abyss-bloom-dbg` then `AdjList` or `abyss-overlap`
 - BCALM2  `bcalm | convertToGFA.py`
 - SGA `sga index | sga filter | sga overlap | sga assemble`
 
+
 ## Denoise
+
+Remove exclusively sequencing errors from the graph, keep variants.
+
+GFA (SE) &rarr; GFA (SE)
+
+- Prune tips
+- Collapse bulges due to sequencing errors
+
+Tools:
 
 - ABySS `abyss-filtergraph`
 - lh3/gfa1 `gfaview -t`
 
-## Collapse bulges
+## Simplification
+
+Identify and/or remove variants from the graph.
+
+GFA (SE) &rarr; GFA (SE)
+
+- Identify bulges: GFA (SE) &rarr; GFA (SEU)
+- Collapse bulges: GFA (SEU) &rarr; GFA (SE)
+
+Collapsed bulges may select a single sequence or may compute a consensus sequence, using IUPAC ambiguity codes.
+
+Tools:
 
 - ABySS `PopBubbles | MergeContigs`
 - lh3/gfa1 `gfaview -b`
 
-## Thread reads
+## Repeat-resolution
 
-- Minimap2 `minimap2`
+### Read mapping
+
+Align reads to the assembly graph.
+
+FASTQ + FASTA &rarr; FASTQ + FASTA + BAM
+
+Tools:
+
 - Unicycler `unicycler_align`
-
-## Map reads
-
 - ABySS `abyss-map`
 - BWA `bwa mem -p`
 - Minimap2 `minimap2 -xsr` for short reads
+- BGREAT2 `bgreat`
 
-## Estimate copy number
+### Read threading
+
+Resolve repeats in the graph
+
+FASTQ + GFA (SE) + FASTQ &rarr; FASTQ + GFA (SE) + PAF
+
+Tool:
+
+- ???
+
+### Estimate copy number
+
+Estimate the copy number of each unitig.
+
+GFA (SE) + BAM/PAF &rarr; GFA (S[CN],E)
+
+- Count reads per unitig: GFA (SE) + BAM/PAF &rarr; GFA (S[RC],E)
+- Estimate copy number: GFA (S[RC],E) &rarr; GFA (S[CN],E)
+
+Tools:
 
 - SGA `sga-astat.py`
 
-## Link unitigs
+## Scaffold
+
+Scaffolding is the combination of the three stages of link unitigs, order and orient, and contract paths.
+
+FASTA/GFA(S) + BAM/PAF &rarr; FASTA/GFA(S)
+
+### Link unitigs
+
+Identify pairs of unitigs that are proximal. Estimate their relative order, orientation, and distance.
+
+GFA (SE) + BAM/PAF &rarr; GFA (SEG)
+
+Tools:
 
 - ABySS `abyss-fixmate | DistanceEst` for paired-end and mate-pair reads
 - ABySS `abyss-longseqdist` for long reads
 - ARCS `arcs` for linked reads
 
-## Order and orient
+### Order and orient
+
+Order and orient paths of unitigs. Contigs are created by contiguous paths of sequence segments. Scaffolds are created by discontiguous paths of sequence segments.
+
+GFA (SEG) &rarr; GFA (SEO)
+
+Tools:
 
 - ABySS `abyss-scaffold` or `SimpleGraph | MergePaths`
 - SGA `sga scaffold`
+- BESST `runBESST`
+- and so many other scaffolders that take a BAM file as input..
 
-## Contract paths
+### Contract paths
+
+Glue vertices of paths and replace each path with a single sequence segment.
+
+GFA (SEO) &rarr; GFA (SE)
+
+Tools:
 
 - ABySS `MergeContigs`
 - SGA `sga scaffold2fasta`
