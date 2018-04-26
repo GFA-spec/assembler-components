@@ -177,7 +177,9 @@ FASTQ + FASTA/GFA (SE) + BAM/PAF &rarr; FASTA/GFA (SE)
 - [BCALM2](https://github.com/GATB/bcalm#readme)
 - [BCOOL](https://github.com/Malfoy/BCOOL#readme)
 - [BFC](https://github.com/lh3/bfc#readme)
+- [EMA](http://ema.csail.mit.edu)
 - [lh3/gfa1](https://github.com/lh3/gfa1#readme)
+- [Long Ranger](https://10xgenomics.com)
 - [Nanopolish](https://github.com/jts/nanopolish#readme)
 - [Pilon](https://github.com/broadinstitute/pilon#readme)
 - [Racon](https://github.com/isovic/racon#readme)
@@ -221,8 +223,10 @@ Tools are specific to each sequencing technology and numerous and so will not be
 ## Map reads
 
 - ABySS `abyss-map`
-- BWA `bwa mem -p`
-- Minimap2 `minimap2 -xsr` for short reads
+- BWA `bwa mem`
+- EMA `ema align` for linked reads
+- Long Ranger `longranger align` for linked reads
+- Minimap2 `minimap2`
 
 ## Estimate copy number
 
