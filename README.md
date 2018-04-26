@@ -157,15 +157,15 @@ GFA (SE) + BAM/PAF &rarr; GFA (S[CN],E)
 
 Note that the median depth of coverage is more robust than the mean depth of coverage to the alignment artifacts caused by collapsed repeats, misaligned reads, and other issues.
 
-## Scaffold
+## Resolve repeats and scaffold
 
-Order and orient sequence segments using alignments of reads to the assembly, and produce new sequences and segments.
+Expand repeats, and order and orient sequence segments into contigs and scaffolds.
 
 FASTA/GFA (SE) + BAM/PAF &rarr; FASTA/GFA (SE)
 
-A tool may implement scaffolding as a single stage of assembly. Scaffolding however may be viewed as composed of the three distinct stages: link unitigs, order and orient unitigs to construct paths, and contract paths to create new sequence segments.
+Contigs are contiguous sequences with no gaps. Creating contigs requires expanding the repetitive sequence found between the unique contigs. Contigs are derived from contiguous paths of sequence segments without any gaps. Scaffolds are derived from discontiguous paths of sequence segments with gaps between the segments.
 
-Contigs are created by contiguous paths of sequence segments. Scaffolds are created by discontiguous paths of sequence segments.
+A tool may implement scaffolding as a single stage of assembly. Scaffolding however may be viewed as composed of the three distinct stages: link unitigs, order and orient unitigs to construct paths, and contract paths to create new sequence segments.
 
 - | **Link unitigs**
   | Identify pairs of unitigs that are proximal. Estimate their relative order, orientation, and distance.
