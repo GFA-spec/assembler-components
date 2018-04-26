@@ -62,14 +62,14 @@ GFA (SE) + BAM/PAF &rarr; GFA (S[CN],E)
 
 ## Preprocess reads
 
-Remove sequencing artifacts specific to each sequencing technology.
+Remove sequencing artifacts that are specific to each sequencing technology.
 
 FASTQ &rarr; FASTQ
 
 - Trim adapter sequences
-- Split chimeric reads
-- Merge overlapping paired-end reads
 - Extract barcode sequences
+- Merge overlapping paired-end reads
+- Split chimeric reads
 
 ## Quality control
 
@@ -212,19 +212,37 @@ FASTA/GFA (S) &rarr; TSV
 - [Long Ranger](https://10xgenomics.com)
 - [Nanopolish](https://github.com/jts/nanopolish#readme)
 - [ntCard](https://github.com/bcgsc/ntcard#readme)
+- [NxTrim](https://github.com/sequencing/NxTrim#readme)
 - [Pilon](https://github.com/broadinstitute/pilon#readme)
+- [Porechop](https://github.com/rrwick/Porechop#readme)
 - [QUAST](https://github.com/ablab/quast#readme)
 - [Racon](https://github.com/isovic/racon#readme)
 - [SGA](https://github.com/jts/sga#readme)
 - [SGA](https://github.com/jts/sga#readme)
 - [Tigmint](https://github.com/bcgsc/tigmint#readme)
+- [Trimadap](https://github.com/lh3/trimadap#readme)
 - [Unicycler](https://github.com/rrwick/Unicycler#readme)
 
 A tool may combine multiple assembly stages in a single tool.
 
 ## Preprocess reads
 
-Tools are specific to each sequencing technology and numerous and so will not be listed here.
+### Illumina mate-pair
+
+- NxTrim
+
+### Illumina paired-end
+
+- Trimadap
+
+### Linked reads
+
+- EMA `ema preprocess`
+- Long Ranger `longranger basic`
+
+### Nanopore
+
+- Porechop
 
 ## Quality control
 
