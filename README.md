@@ -100,10 +100,14 @@ Collapse bulges caused by heterozygosity.
 
 GFA (SE) &rarr; GFA (SE)
 
-- Identify bulges: GFA (SE) &rarr; GFA (SEU)
-- Collapse bulges: GFA (SEU) &rarr; GFA (SE)
+- | **Identify bulges**
+  | Identify bulges and create unordered groups of sequence segments.
+  | GFA (SE) &rarr; GFA (SEU)
+- | **Collapse bulges**
+  | Collapse bulges, possibly creating new sequence segments.
+  | GFA (SEU) &rarr; GFA (SE)
 
-Collapsed bulges may select a single sequence or may compute a consensus sequence, using IUPAC ambiguity codes.
+A single sequence or path through the bulge may be selected, or the bulge may be replaced by a consensus sequence, possibly using IUPAC ambiguity codes to represent the consensus.
 
 ## Thread reads
 
