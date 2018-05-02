@@ -2,6 +2,12 @@
 
 Components of genome sequence assembly tools
 
+# Rationale
+
+Genome, metagenome and transcriptome assemblers range from fully integrated to fully modular. Fully modular assembly has a number of benefits. This repository is ongoing work to define some important checkpoints in a modular assembly pipeline, along with standard input/output formats. For now we have a bias towards Illumina-type sequencing data (single reads, paired reads, mate-pairs, 10x), but we aim to make the components also compatible with 3rd generation reads.
+
+Feel free to contribute via pull-requests.
+
 # File formats
 
 - FASTQ reads
@@ -62,7 +68,7 @@ GFA (SE) + BAM/PAF &rarr; GFA (S[CN],E)
 
 ## Preprocess reads
 
-Remove sequencing artifacts that are specific to each sequencing technology.
+Remove sequencing artifacts specific to each sequencing technology. Improve the quality of the input reads with minimal loss of information, for example heterozygous variants.
 
 FASTQ &rarr; FASTQ
 
@@ -109,37 +115,31 @@ FASTQ &rarr; GFA (SE)
 
 ## Denoise
 
-Remove sequences and edges caused by sequencing error.
+Remove sequencing errors from the assembly graph. Retain variants.
 
 GFA (SE) &rarr; GFA (SE)
 
 - Prune tips
-- Collapse bulges due to sequencing errors
+- Remove bulges due to sequencing errors
 
-## Collapse bulges
+## Collapse variants
 
-Collapse bulges caused by heterozygosity.
+Identify and/or remove variants from the graph.
 
 GFA (SE) &rarr; GFA (SE)
 
-- | **Identify bulges**
+- | **Identify variants**
   | Identify bulges and create unordered groups of sequence segments.
   | GFA (SE) &rarr; GFA (SEU)
-- | **Collapse bulges**
+- | **Collapse variants**
   | Collapse bulges, possibly creating new sequence segments.
   | GFA (SEU) &rarr; GFA (SE)
 
 A single sequence or path through the bulge may be selected, or the bulge may be replaced by a consensus sequence, possibly using IUPAC ambiguity codes to represent the consensus.
 
-## Thread reads
-
-Align reads to the assembly graph.
-
-FASTQ + GFA (SE) + FASTQ &rarr; PAF
-
 ## Map reads
 
-Map reads to their single best position in the draft genome.
+Map reads to the assembly sequences.
 
 FASTQ + GFA (S)/FASTA &rarr; BAM
 
@@ -210,6 +210,7 @@ FASTA/GFA (S) &rarr; TSV
 - [BCALM2](https://github.com/GATB/bcalm#readme)
 - [BCOOL](https://github.com/Malfoy/BCOOL#readme)
 - [BFC](https://github.com/lh3/bfc#readme)
+- [BGREAT2](https://github.com/Malfoy/BGREAT2#readme)
 - [EMA](http://ema.csail.mit.edu)
 - [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
 - [GenomeScope](https://github.com/schatzlab/genomescope#readme)
@@ -223,7 +224,6 @@ FASTA/GFA (S) &rarr; TSV
 - [Porechop](https://github.com/rrwick/Porechop#readme)
 - [QUAST](https://github.com/ablab/quast#readme)
 - [Racon](https://github.com/isovic/racon#readme)
-- [SGA](https://github.com/jts/sga#readme)
 - [SGA](https://github.com/jts/sga#readme)
 - [Tigmint](https://github.com/bcgsc/tigmint#readme)
 - [Trimadap](https://github.com/lh3/trimadap#readme)
@@ -275,23 +275,20 @@ A tool may combine multiple assembly stages in a single tool.
 - ABySS `abyss-filtergraph`
 - lh3/gfa1 `gfaview -t`
 
-## Collapse bulges
+## Collapse variants
 
 - ABySS `PopBubbles | MergeContigs`
 - lh3/gfa1 `gfaview -b`
 
-## Thread reads
-
-- Minimap2 `minimap2`
-- Unicycler `unicycler_align`
-
 ## Map reads
 
 - ABySS `abyss-map`
+- BGREAT2 `bgreat`
 - BWA `bwa mem`
 - EMA `ema align` for linked reads
 - Long Ranger `longranger align` for linked reads
 - Minimap2 `minimap2`
+- Unicycler `unicycler_align`
 
 ## Estimate copy number
 
@@ -351,7 +348,7 @@ gunzip -c 0_pe.fq.gz | ABYSS -k100 -t0 -c0 -b0 -o 1_unitig.fa -
 AdjList --gfa2 -k100 1_unitig.fa >1_unitig.gfa 
 # Denoise
 abyss-filtergraph --gfa2 -k100 -t200 -c3 -g 2_denoise.gfa 1_unitig.gfa
-# Collapse bulges
+# Collapse variants
 PopBubbles --gfa2 -k100 -p0.99 -g 3_debulge.gfa 1_unitig.fa 2_denoise.gfa >3_debulge.path
 MergeContigs --gfa2 -k100 -g 3_debulge.gfa -o 3_debulge.fa 1_unitig.fa 2_denoise.gfa 3_debulge.path
 # Map reads
