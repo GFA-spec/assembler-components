@@ -376,3 +376,55 @@ abyss-todot --gfa1 9_assembly.gfa >9_assembly.gfa1
 # Visualize the assembly graph
 Bandage load 9_assembly.gfa1 &
 ```
+
+## BCALM+ABySS
+
+Assemble reads using BCALM for unitigs, then the rest of the ABySS pipeline from the previous example.
+
+```
+# make sure you have bcalm: https://github.com/GATB/bcalm/releases
+
+# Install the dependencies
+pip install gfapy
+brew install abyss curl pigz samtools seqtk
+# Download the data
+seqtk mergepe <(curl -Ls https://github.com/rrwick/Unicycler/raw/master/sample_data/short_reads_1.fastq.gz) <(curl -Ls https://github.com/rrwick/Unicycler/raw/master/sample_data/short_reads_2.fastq.gz) | gzip >0_pe.fq.gz
+# Unitig with BCALM
+bcalm -in 0_pe.fq.gz -out 1_bcalm -kmer-size 99 -abundance-min 1
+convertToGFA.py 1_bcalm.unitigs.fa 1_unitig.gfa 99
+# convert bcalm output to gfa2
+echo -e 'H\tVN:Z:1.0' > 1_unitig.gfa1
+tail -n +2 1_unitig.gfa >> 1_unitig.gfa1
+gfapy-convert 1_unitig.gfa1 > 1_unitig.gfa2
+# Denoise
+abyss-filtergraph --gfa2 -k99 -t200 -c3 -g 2_denoise.gfa 1_unitig.gfa2
+# Collapse variants
+PopBubbles --gfa2 -k99 -p0.99 -g 3_debulge.gfa 1_bcalm.unitigs.fa 2_denoise.gfa >3_debulge.path
+MergeContigs --gfa2 -k99 -g 3_debulge.gfa -o 3_debulge.fa 1_bcalm.unitigs.fa 2_denoise.gfa 3_debulge.path
+# Map reads
+gunzip -c 0_pe.fq.gz | abyss-map - 3_debulge.fa | pigz >3_debulge.sam.gz
+# Link unitigs
+gunzip -c 3_debulge.sam.gz | abyss-fixmate -h 4_link.tsv | samtools sort -Osam | DistanceEst --dist -k99 -s500 -n1 4_link.tsv >4_link.dist
+# Resolve repeats
+samtools faidx 3_debulge.fa
+SimpleGraph -k99 -s500 -n5 -o 5_resolverepeats-1.path 3_debulge.gfa 4_link.dist
+MergePaths -k99 -o 5_resolverepeats.path 3_debulge.fa.fai 5_resolverepeats-1.path
+# Contract paths
+MergeContigs --gfa2 -k99 -g 6_contigs.gfa -o 6_contigs.fa 3_debulge.fa 3_debulge.gfa 5_resolverepeats.path
+# Map reads
+gunzip -c 0_pe.fq.gz | abyss-map - 6_contigs.fa | pigz >6_contigs.sam.gz
+# Link unitigs
+gunzip -c 6_contigs.sam.gz | abyss-fixmate -h 7_link.tsv | samtools sort -Osam | DistanceEst --dot -k99 -s500 -n1 7_link.tsv >7_link.gv
+# Order and orient
+abyss-scaffold -k99 -s500-1000 -n5-10 6_contigs.gfa 7_link.gv >8_scaffold.path
+# Contract paths
+MergeContigs --gfa2 -k99 -g 9_assembly.gfa -o 9_assembly.fa 6_contigs.fa 6_contigs.gfa 8_scaffold.path
+# Compute assembly metrics
+abyss-fac 9_assembly.fa
+# Convert GFA2 to GFA1
+abyss-todot --gfa1 9_assembly.gfa >9_assembly.gfa1
+# Visualize the assembly graph
+Bandage load 9_assembly.gfa1 &
+```
+
+
