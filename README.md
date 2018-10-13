@@ -332,47 +332,175 @@ A tool may combine multiple assembly stages in a single tool.
 
 # Pipelines
 
+The data is from Unicycler: "These are synthetic reads from plasmids A, B and E from the Shigella sonnei 53G genome assembly". [Shigella sonnei plasmids (synthetic reads)](https://github.com/rrwick/Unicycler/tree/master/sample_data#shigella-sonnei-plasmids-synthetic-reads), [short_reads_1.fastq.gz](https://github.com/rrwick/Unicycler/raw/master/sample_data/short_reads_1.fastq.gz), [short_reads_2.fastq.gz](https://github.com/rrwick/Unicycler/raw/master/sample_data/short_reads_2.fastq.gz)
+
 ## ABySS
 
 Assemble paired-end reads using ABySS. This ABySS pipeline is a minimal subset of tools run by the complete `abyss-pe` pipeline.
 
-This data is from Unicycler: "These are synthetic reads from plasmids A, B and E from the Shigella sonnei 53G genome assembly". [Shigella sonnei plasmids (synthetic reads)](https://github.com/rrwick/Unicycler/tree/master/sample_data#shigella-sonnei-plasmids-synthetic-reads), [short_reads_1.fastq.gz](https://github.com/rrwick/Unicycler/raw/master/sample_data/short_reads_1.fastq.gz), [short_reads_2.fastq.gz](https://github.com/rrwick/Unicycler/raw/master/sample_data/short_reads_2.fastq.gz)
+```sh
+cd components
+k=99
+./download_test_data.sh
+./abyss_unitigs.sh 0_pe.fq.gz $k
+./abyss_contigs_from_unitigs.sh 1_unitig.gfa2 1_unitig.fa $k
+./abyss_scaffolding.sh 6_contigs.fa 6_contigs.gfa $k
+# Visualize the assembly graph
+Bandage load 9_assembly.gfa1 &
+```
+
+## BCALM+ABySS
+
+This assembles reads using BCALM for unitigs, then uses the rest of the ABySS pipeline from the previous example.
 
 ```sh
-# Install the dependencies
-brew install abyss curl pigz samtools seqtk
-# Download the data
+cd components
+k=99
+./download_test_data.sh
+./bcalm.sh 0_pe.fq.gz $k
+./abyss_contigs_from_unitigs.sh 1_unitig.gfa2 1_unitig.fa $k
+./abyss_scaffolding.sh 6_contigs.fa 6_contigs.gfa $k
+# Visualize the assembly graph
+Bandage load 9_assembly.gfa1 &
+```
+
+# Components
+
+## Download test data
+ 
+<!-- markdown-exec(cmd:echo " components/download_test_data.sh" && echo "\`\`\`sh" && cat components/download_test_data.sh && echo "\`\`\`" && echo " --"  ) -->components/download_test_data.sh
+```sh
+# Download Unicycler test data
+# input: nothing
+# output: 0_pe.fq.gz
+
+#install dependencies
+brew install seqtk curl
+
 seqtk mergepe <(curl -Ls https://github.com/rrwick/Unicycler/raw/master/sample_data/short_reads_1.fastq.gz) <(curl -Ls https://github.com/rrwick/Unicycler/raw/master/sample_data/short_reads_2.fastq.gz) | gzip >0_pe.fq.gz
+```
+ --<!-- /markdown-exec -->
+
+## From reads to unitigs with BCALM
+
+<!-- markdown-exec(cmd:echo "components/bcalm.sh" && echo "\`\`\`sh" && cat components/bcalm.sh && echo "\`\`\`"  && echo " --" ) -->components/bcalm.sh
+```sh
+# input: [reads] [k]
+# e.g. 0_pe.fq.gz 99
+#
+# output: 1_unitig.gfa2
+# contains unitigs created by BCALM
+
+# make sure bcalm and convertToGFA.py are in your path (will later be automatically done by 'conda install bcalm' when someone makes bcalm availaon conda)
+
+reads=$1
+k=$2
+
+# Install the dependencies
+pip install gfapy
+# Unitig with BCALM
+bcalm -in $1 -out 1_bcalm -kmer-size $k -abundance-min 1 -verbose 0
+mv 1_bcalm.unitigs.fa 1_unitig.fa
+convertToGFA.py 1_unitig.fa 1_unitig.gfa $k
+# convert bcalm output to gfa2
+(printf "H\tVN:Z:1.0\n"; tail -n +2 1_unitig.gfa) >1_unitig.gfa1
+gfapy-convert 1_unitig.gfa1 > 1_unitig.gfa2
+
+# cleanup
+rm -f 1_bcalm*glue* 1_bcalm.h5
+```
+ --<!-- /markdown-exec -->
+
+## From reads to unitigs with ABySS
+
+<!-- markdown-exec(cmd:echo "components/abyss_unitigs.sh" && echo "\`\`\`sh" && cat components/abyss_unitigs.sh && echo "\`\`\`"  && echo " --" ) -->components/abyss_unitigs.sh
+```sh
+# input: [reads] [k]
+# e.g. 0_pe.fq.gz 99
+#
+# output: 1_unitig.gfa2 1_unitig.fa
+# contains unitigs created by abyss
+
+reads=$1
+k=$2
+
+# setting up
+brew install abyss
+
 # Unitig
-gunzip -c 0_pe.fq.gz | ABYSS -k100 -t0 -c0 -b0 -o 1_unitig.fa -
-AdjList --gfa2 -k100 1_unitig.fa >1_unitig.gfa 
+gunzip -c $reads | ABYSS -k$k -t0 -c0 -b0 -o 1_unitig.fa -
+AdjList --gfa2 -k$k 1_unitig.fa >1_unitig.gfa 
+mv 1_unitig.gfa 1_unitig.gfa2
+```
+ --<!-- /markdown-exec -->
+
+
+## From unitigs to contigs with ABySS 
+
+<!-- markdown-exec(cmd:echo "components/abyss_contigs_from_unitigs.sh"  && echo "\`\`\`sh" && cat components/abyss_contigs_from_unitigs.sh && echo "\`\`\`" && echo " --"   ) -->components/abyss_contigs_from_unitigs.sh
+```sh
+# input: [unitigs.gfa2] [unitigs.fa] [k]
+# e.g. 1_unitig.gfa2 1_unitigs.fa 100
+#
+# output: 6_contigs.gfa and 6_contigs.fa
+# contigs produced by ABySS
+
+unitigs_gfa2=$1
+unitigs_fa=$2
+k=$3
+
+# install dependencies
+brew install abyss pigz samtools
+
 # Denoise
-abyss-filtergraph --gfa2 -k100 -t200 -c3 -g 2_denoise.gfa 1_unitig.gfa
+abyss-filtergraph --gfa2 -k$k -t200 -c3 -g 2_denoise.gfa $unitigs_gfa2
 # Collapse variants
-PopBubbles --gfa2 -k100 -p0.99 -g 3_debulge.gfa 1_unitig.fa 2_denoise.gfa >3_debulge.path
-MergeContigs --gfa2 -k100 -g 3_debulge.gfa -o 3_debulge.fa 1_unitig.fa 2_denoise.gfa 3_debulge.path
+PopBubbles --gfa2 -k$k -p0.99 -g 3_debulge.gfa $unitigs_fa 2_denoise.gfa >3_debulge.path
+MergeContigs --gfa2 -k$k -g 3_debulge.gfa -o 3_debulge.fa $unitigs_fa 2_denoise.gfa 3_debulge.path
 # Map reads
 gunzip -c 0_pe.fq.gz | abyss-map - 3_debulge.fa | pigz >3_debulge.sam.gz
 # Link unitigs
-gunzip -c 3_debulge.sam.gz | abyss-fixmate -h 4_link.tsv | samtools sort -Osam | DistanceEst --dist -k100 -s500 -n1 4_link.tsv >4_link.dist
+gunzip -c 3_debulge.sam.gz | abyss-fixmate -h 4_link.tsv | samtools sort -Osam | DistanceEst --dist -k$k -s500 -n1 4_link.tsv >4_link.dist
 # Resolve repeats
 samtools faidx 3_debulge.fa
-SimpleGraph -k100 -s500 -n5 -o 5_resolverepeats-1.path 3_debulge.gfa 4_link.dist
-MergePaths -k100 -o 5_resolverepeats.path 3_debulge.fa.fai 5_resolverepeats-1.path
+SimpleGraph -k$k -s500 -n5 -o 5_resolverepeats-1.path 3_debulge.gfa 4_link.dist
+MergePaths -k$k -o 5_resolverepeats.path 3_debulge.fa.fai 5_resolverepeats-1.path
 # Contract paths
-MergeContigs --gfa2 -k100 -g 6_contigs.gfa -o 6_contigs.fa 3_debulge.fa 3_debulge.gfa 5_resolverepeats.path
+MergeContigs --gfa2 -k$k -g 6_contigs.gfa -o 6_contigs.fa 3_debulge.fa 3_debulge.gfa 5_resolverepeats.path
+
+# cleanup (comment to keep files)
+rm -f 5_resolverepeats.path 3_debulge.gfa 3_debulge.fa 3_debulge.fa.fai 3_debulge.path 5_resolverepeats-1.path 4_link.dist 4_link.tsv 2_denoise.gfa 3_debulge.sam.gz 
+```
+ --<!-- /markdown-exec -->
+
+## From contigs to scaffolds with ABySS
+
+<!-- markdown-exec(cmd:echo "components/abyss_scaffolding.sh"  && echo "\`\`\`sh" && cat components/abyss_scaffolding.sh && echo "\`\`\`" && echo " --"   ) -->components/abyss_scaffolding.sh
+```sh
+# input: [contigs.fa] [contigs.gfa] [k]
+# e.g. 6_contigs.fa 6_contigs.gfa 99
+# 
+# output: 9_assembly.gfa and 9_assembly.gfa1
+# scaffolds assembly using abyss scaffolder in GFA2 and GFA1 format
+
+contigs_fa=$1
+contigs_gfa=$2
+k=$3
+
 # Map reads
-gunzip -c 0_pe.fq.gz | abyss-map - 6_contigs.fa | pigz >6_contigs.sam.gz
+gunzip -c 0_pe.fq.gz | abyss-map - $contigs_fa | pigz >6_contigs.sam.gz
 # Link unitigs
-gunzip -c 6_contigs.sam.gz | abyss-fixmate -h 7_link.tsv | samtools sort -Osam | DistanceEst --dot -k100 -s500 -n1 7_link.tsv >7_link.gv
+gunzip -c 6_contigs.sam.gz | abyss-fixmate -h 7_link.tsv | samtools sort -Osam | DistanceEst --dot -k$k -s500 -n1 7_link.tsv >7_link.gv
 # Order and orient
-abyss-scaffold -k100 -s500-1000 -n5-10 6_contigs.gfa 7_link.gv >8_scaffold.path
+abyss-scaffold -k$k -s500-1000 -n5-10 $contigs_gfa 7_link.gv >8_scaffold.path
 # Contract paths
-MergeContigs --gfa2 -k100 -g 9_assembly.gfa -o 9_assembly.fa 6_contigs.fa 6_contigs.gfa 8_scaffold.path
+MergeContigs --gfa2 -k$k -g 9_assembly.gfa -o 9_assembly.fa $contigs_fa $contigs_gfa 8_scaffold.path
 # Compute assembly metrics
 abyss-fac 9_assembly.fa
 # Convert GFA2 to GFA1
 abyss-todot --gfa1 9_assembly.gfa >9_assembly.gfa1
-# Visualize the assembly graph
-Bandage load 9_assembly.gfa1 &
+
+# cleanup (comment to remove)
+rm -f 6_contigs.sam.gz 7_link.gv 7_link.tsv 8_scaffold.path 8_scaffold.path
 ```
+ --<!-- /markdown-exec -->
