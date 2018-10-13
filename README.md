@@ -364,11 +364,12 @@ k=99
 Bandage load 9_assembly.gfa1 &
 ```
 
-## Components
+# Components
 
-### Download test data
+## Download test data
  
-<!-- markdown-exec(cmd:echo "\`\`\`sh" && cat components/download_test_data.sh && echo "\`\`\`"   ) -->```sh
+<!-- markdown-exec(cmd:echo " components/download_test_data.sh" && echo "\`\`\`sh" && cat components/download_test_data.sh && echo "\`\`\`" && echo " --"  ) -->components/download_test_data.sh
+```sh
 # Download Unicycler test data
 # input: nothing
 # output: 0_pe.fq.gz
@@ -377,11 +378,13 @@ Bandage load 9_assembly.gfa1 &
 brew install seqtk curl
 
 seqtk mergepe <(curl -Ls https://github.com/rrwick/Unicycler/raw/master/sample_data/short_reads_1.fastq.gz) <(curl -Ls https://github.com/rrwick/Unicycler/raw/master/sample_data/short_reads_2.fastq.gz) | gzip >0_pe.fq.gz
-```<!-- /markdown-exec -->
+```
+ --<!-- /markdown-exec -->
 
-### From reads to unitigs with BCALM
+## From reads to unitigs with BCALM
 
-<!-- markdown-exec(cmd:echo "\`\`\`sh" && cat components/bcalm.sh && echo "\`\`\`"   ) -->```sh
+<!-- markdown-exec(cmd:echo "components/bcalm.sh" && echo "\`\`\`sh" && cat components/bcalm.sh && echo "\`\`\`"  && echo " --" ) -->components/bcalm.sh
+```sh
 # input: [reads] [k]
 # e.g. 0_pe.fq.gz 99
 #
@@ -405,11 +408,13 @@ gfapy-convert 1_unitig.gfa1 > 1_unitig.gfa2
 
 # cleanup
 rm -f 1_bcalm*glue* 1_bcalm.h5
-```<!-- /markdown-exec -->
+```
+ --<!-- /markdown-exec -->
 
-### From unitigs to contigs with ABySS 
+## From unitigs to contigs with ABySS 
 
-<!-- markdown-exec(cmd:echo "\`\`\`sh" && cat components/abyss_contigs_from_unitigs.sh && echo "\`\`\`"   ) -->```sh
+<!-- markdown-exec(cmd:echo "components/abyss_contigs_from_unitigs.sh"  && echo "\`\`\`sh" && cat components/abyss_contigs_from_unitigs.sh && echo "\`\`\`" && echo " --"   ) -->components/abyss_contigs_from_unitigs.sh
+```sh
 # input: [unitigs.gfa2] [unitigs.fa] [k]
 # e.g. 1_unitig.gfa2 1_unitigs.fa 100
 #
@@ -441,11 +446,13 @@ MergeContigs --gfa2 -k$k -g 6_contigs.gfa -o 6_contigs.fa 3_debulge.fa 3_debulge
 
 # cleanup (comment to keep files)
 rm -f 5_resolverepeats.path 3_debulge.gfa 3_debulge.fa 3_debulge.fa.fai 3_debulge.path 5_resolverepeats-1.path 4_link.dist 4_link.tsv 2_denoise.gfa 3_debulge.sam.gz 
-```<!-- /markdown-exec -->
+```
+ --<!-- /markdown-exec -->
 
-### From contigs to scaffolds with ABySS
+## From contigs to scaffolds with ABySS
 
-<!-- markdown-exec(cmd:echo "\`\`\`sh" && cat components/abyss_scaffolding.sh && echo "\`\`\`"   ) -->```sh
+<!-- markdown-exec(cmd:echo "components/abyss_scaffolding.sh"  && echo "\`\`\`sh" && cat components/abyss_scaffolding.sh && echo "\`\`\`" && echo " --"   ) -->components/abyss_scaffolding.sh
+```sh
 # input: [contigs.fa] [contigs.gfa] [k]
 # e.g. 6_contigs.fa 6_contigs.gfa 99
 # 
@@ -471,4 +478,5 @@ abyss-todot --gfa1 9_assembly.gfa >9_assembly.gfa1
 
 # cleanup (comment to remove)
 rm -f 6_contigs.sam.gz 7_link.gv 7_link.tsv 8_scaffold.path 8_scaffold.path
-```<!-- /markdown-exec -->
+```
+ --<!-- /markdown-exec -->
