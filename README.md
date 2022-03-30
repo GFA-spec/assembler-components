@@ -512,7 +512,8 @@ MergeContigs --gfa2 -k$k 2_denoised.fa 3_denoised.gfa2 3_denoised.paths -o 6_con
 
 # cleanup (comment to keep files)
 rm -f 2_denoised.gfa1.sorted 2_denoise.gfa1 2_denoised.gfa1 3_denoised.paths 3_denoised.gfa2
-```<!-- /markdown-exec -->
+```
+<!-- /markdown-exec -->
 
 ## From contigs to scaffolds with ABySS
 
@@ -543,4 +544,5 @@ abyss-todot --gfa1 9_assembly.gfa >9_assembly.gfa1
 
 # cleanup (comment to remove)
 rm -f 6_contigs.sam.gz 7_link.gv 7_link.tsv 8_scaffold.path 8_scaffold.path
-```<!-- /markdown-exec -->
+```
+<!-- /markdown-exec -->
