@@ -1,7 +1,7 @@
 # input: [unitigs.gfa2] [unitigs.fa] [k]
 # e.g. 1_unitig.gfa2 1_unitigs.fa 100
 #
-# output: 6_contigs.gfa and 6_contigs.fa
+# output: 6_contigs.gfa2 and 6_contigs.fa
 # contigs produced by ABySS
 
 unitigs_gfa2=$1
@@ -25,7 +25,7 @@ samtools faidx 3_debulge.fa
 SimpleGraph -k$k -s500 -n5 -o 5_resolverepeats-1.path 3_debulge.gfa 4_link.dist
 MergePaths -k$k -o 5_resolverepeats.path 3_debulge.fa.fai 5_resolverepeats-1.path
 # Contract paths
-MergeContigs --gfa2 -k$k -g 6_contigs.gfa -o 6_contigs.fa 3_debulge.fa 3_debulge.gfa 5_resolverepeats.path
+MergeContigs --gfa2 -k$k -g 6_contigs.gfa2 -o 6_contigs.fa 3_debulge.fa 3_debulge.gfa 5_resolverepeats.path
 
 # cleanup (comment to keep files)
 rm -f 5_resolverepeats.path 3_debulge.gfa 3_debulge.fa 3_debulge.fa.fai 3_debulge.path 5_resolverepeats-1.path 4_link.dist 4_link.tsv 2_denoise.gfa 3_debulge.sam.gz 
